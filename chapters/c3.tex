@@ -1,0 +1,100 @@
+\chapter{Citations and links} \label{ch3}
+
+References are managed with biblatex and biber, in the author--year style:
+citations show the surname of the authors and the year of publication, and
+the bibliography at the end of the thesis is sorted alphabetically.
+
+\section{The bibliography file}
+
+References are stored in \texttt{bibliography.bib}, one entry per work, each
+identified by a key:
+\begin{Verbatim}
+@article{breiman2001random,
+  author  = {Breiman, Leo},
+  title   = {Random Forests},
+  journal = {Machine Learning},
+  volume  = {45},
+  number  = {1},
+  pages   = {5--32},
+  year    = {2001},
+  doi     = {10.1023/A:1010933404324}
+}
+\end{Verbatim}
+Write author names as \texttt{Surname, Name} and separate them with
+\texttt{and}. Export services such as Google Scholar, DBLP or the publisher's
+web site provide entries in this format, but check them: they often contain
+mistakes or miss the DOI. Only the works actually cited in the text are
+listed in the bibliography, which is printed by \cs{printthesisbibliography}
+at the end of \texttt{main.tex}.
+
+\section{Citing}
+
+Citations use the familiar commands of the natbib package. The two most
+common forms are the parenthetical one, \cs{citep}, and the textual one,
+\cs{citet}, where the author names are part of the sentence:
+\begin{Verbatim}
+Random forests \citep{breiman2001random} combine ...
+As shown by \citet{breiman2001random}, ...
+\end{Verbatim}
+which produce: ``Random forests \citep{breiman2001random} combine \dots''
+and ``As shown by \citet{breiman2001random}, \dots''. Table~\ref{tab:cite}
+lists the other available commands.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Citation commands and their output.}
+  \label{tab:cite}
+  \begin{tabular}{ll}
+    \toprule
+    Command & Output \\
+    \midrule
+    \verb|\citep{cortes1995support}|            & \citep{cortes1995support} \\
+    \verb|\citet{cortes1995support}|            & \citet{cortes1995support} \\
+    \verb|\citep[p.~280]{cortes1995support}|    & \citep[p.~280]{cortes1995support} \\
+    \verb|\citep[see][]{vapnik1995nature}|      & \citep[see][]{vapnik1995nature} \\
+    \verb|\citep{bishop2006pattern,|            & \citep{bishop2006pattern,hastie2009elements} \\
+    \verb|       hastie2009elements}|           & \\
+    \verb|\citealp{pedregosa2011scikit}|        & \citealp{pedregosa2011scikit} \\
+    \verb|\citeauthor{goodfellow2016deep}|      & \citeauthor{goodfellow2016deep} \\
+    \verb|\citeyear{goodfellow2016deep}|        & \citeyear{goodfellow2016deep} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Works with more than two authors are cited with the first author followed
+by ``et al.'', as in \citet{hastie2009elements} or
+\citet{pedregosa2011scikit}; all the authors are listed in the
+bibliography.
+
+\section{DOIs and URLs}
+
+When an entry has a \texttt{doi} field, the bibliography shows it as a
+\texttt{https://doi.org/\dots} link; otherwise, the \texttt{url} field is
+shown, if present (see the entry of \citealp{goodfellow2016deep}). The link
+closes the entry, right-aligned and never broken across lines. Prefer the
+DOI to the URL whenever it exists: it is a permanent identifier, while web
+addresses change over time.
+
+Web addresses in the text are written with \cs{url}, which breaks them only
+after characters such as slashes and dots. The address must be written
+without spaces or line breaks:
+\begin{Verbatim}
+documented at \url{https://scikit-learn.org/stable/modules/...}
+\end{Verbatim}
+For instance, the documentation of the random forest classifier provided
+by scikit-learn is available at
+\url{https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html}.
+
+\section{Links} \label{sec:links}
+
+Citations, cross-references, URLs and DOIs are all hyperlinks, coloured in
+the blue of the SLIM logo. This dark blue is barely distinguishable from
+black on paper. With the option \texttt{pdfa=false}, links are blue when the
+PDF is viewed on screen and black when it is printed, so that the printed
+thesis has a uniform appearance; this is not allowed in a PDF/A file, and a
+few PDF viewers that ignore the distinction may show the links in black or
+print them in blue. To create a link with arbitrary text, use \cs{href}:
+\begin{Verbatim}
+the \href{https://slim.di.unimi.it}{SLIM laboratory}
+\end{Verbatim}
+which gives: the \href{https://slim.di.unimi.it}{SLIM laboratory}.

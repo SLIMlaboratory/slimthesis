@@ -1,0 +1,22 @@
+# LaTeX auxiliary and output files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.loa
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*.xmpdata
+*.xmpi
+*-SAVE-ERROR
+
+# the compiled documentation is published in the releases
+main.pdf

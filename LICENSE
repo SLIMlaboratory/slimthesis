@@ -1,0 +1,57 @@
+Scope
+=====
+
+The MIT license below applies to the slimthesis template: the style
+slimthesis.sty, the file main.tex, the example chapters and front matter,
+the documentation, and the other files of the template, except those listed
+under "Exclusions".
+
+Theses and other documents produced with the template belong to their
+authors and are not subject to this license.
+
+Exclusions
+==========
+
+The following files are distributed with the template but are not covered
+by the MIT license, and remain subject to their own terms:
+
+- images/coverPage/logo_informatica.jpg,
+  images/coverPage/logo_informatica_magistrale.jpg,
+  images/coverPage/logo_unimi.jpg: logos and trademarks of the Università
+  degli Studi di Milano, whose use is governed by the rules of the
+  University.
+
+- images/coverPage/slim-logo.png: logo of the SLIM laboratory, Università
+  degli Studi di Milano; all rights reserved.
+
+- images/license/cc-*.pdf: buttons of the Creative Commons licenses,
+  trademarks of Creative Commons, to be used to mark the license of a work
+  (https://creativecommons.org/policies).
+
+- fonts/Figtree/*.ttf: the Figtree font, Copyright 2022 The Figtree Project
+  Authors, licensed under the SIL Open Font License, Version 1.1 (see
+  fonts/Figtree/OFL.txt).
+
+MIT License
+===========
+
+Copyright (c) 2026 Dario Malchiodi and SLIM laboratory, Università degli
+Studi di Milano
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

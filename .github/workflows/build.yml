@@ -1,0 +1,44 @@
+# Compiles the template at every push and pull request; for a tag v*, it
+# also publishes a release with the documentation (PDF) and the zip archive
+# used by the "Open in Overleaf" link of the README.
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile with LuaLaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          latexmk_use_lualatex: true
+
+      - name: Prepare documentation and Overleaf archive
+        run: |
+          cp main.pdf slimthesis-documentation.pdf
+          git archive --format=zip -o slimthesis-overleaf.zip HEAD
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: slimthesis
+          path: |
+            slimthesis-documentation.pdf
+            slimthesis-overleaf.zip
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            slimthesis-documentation.pdf
+            slimthesis-overleaf.zip

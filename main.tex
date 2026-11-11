@@ -1,0 +1,91 @@
+% Compile with LuaLaTeX (or XeLaTeX):
+%   lualatex main && biber main && lualatex main && lualatex main
+% or simply: latexmk main
+%
+% The output is a PDF/A-2b file (the archival format required for the thesis
+% deposit); add the option pdfa=false to \usepackage{slimthesis} for an
+% ordinary PDF.
+\documentclass[12pt, a4paper, oneside]{book}
+
+% Degree programme (sets cover, language and labels):
+%   inf     Laurea in Informatica (default)
+%   inf-lm  Laurea Magistrale in Informatica
+%   cs      Master's Degree in Computer Science
+%   dse     Master's Degree in Data Science for Economics
+%   dseh    Master's Degree in Data Science for Economics and Health
+\usepackage[programme=dseh]{slimthesis}
+
+% --- Packages used by the content -------------------------------------------
+\usepackage{subcaption}
+% Code listings used by the documentation in chapters/ (can be removed)
+\usepackage{fancyvrb}
+\fvset{fontsize=\small, frame=leftline, framerule=0.8pt, framesep=0.8em,
+       rulecolor=\color{slimblue}, xleftmargin=1em}
+\newcommand{\cs}[1]{\texttt{\textbackslash #1}}  % command name, e.g. \cs{citep}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{longtable}
+\usepackage{pdflscape}     % landscape pages, also rotated in PDF viewers
+\usepackage{afterpage}     % \afterpage, to place landscape pages
+\usepackage[chapter]{algorithm}  % algorithm floats, numbered by chapter
+\usepackage{algpseudocode}       % pseudocode inside them
+\usepackage{siunitx}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{standalone}
+\graphicspath{{./images/}}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.arrows, arrows.meta, positioning, calc, 3d, fit}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{statistics}
+
+\input{style/colors}
+\input{style/symbols}
+\AtBeginDocument{\renewcommand{\epsilon}{\varepsilon}}
+
+\addbibresource{bibliography.bib}
+
+% --- Thesis data --------------------------------------------------------------
+\title{Title of a splendid thesis, or of a final internship report}
+\author{Laure Ando}
+\academicyear{YYYY/YY}
+\studentid{000000}              % matricola, optional
+\keywords{thesis template, LaTeX, SLIM}  % PDF metadata, optional
+\supervisor{Prof.~Super Visor}
+\cosupervisor{Prof.~Cosu Pervisor}
+\cosupervisor{Dr.~Other Supervisor}
+\license{by-nc-sa}                % optional Creative Commons license (by, by-sa,
+%                                 % by-nd, by-nc, by-nc-sa, by-nc-nd, zero), or
+% \customlicense{...}            % any other license or copyright notice
+
+\begin{document}
+
+\frontmatter
+\maketitle
+
+\input{frontmatter/dedication}
+\input{frontmatter/epigraph}
+\input{frontmatter/acknowledgements}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\listofalgorithms
+\input{frontmatter/symbols}
+
+\mainmatter
+\include{chapters/introduction}
+\include{chapters/c1}
+\include{chapters/c2}
+\include{chapters/c3}
+\include{chapters/conclusions}
+
+\appendix
+\include{chapters/appendix}
+
+\printthesisbibliography
+
+\end{document}

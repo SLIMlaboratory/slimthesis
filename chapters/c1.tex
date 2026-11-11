@@ -1,0 +1,267 @@
+\chapter{Getting started} \label{ch1}
+
+Setting up a new thesis only requires editing the preamble of
+\texttt{main.tex}: choose the degree programme, then fill in the thesis
+data. This chapter describes both steps, and the commands that organise the
+document.
+
+\section{Choosing the degree programme} \label{sec:programme}
+
+The degree programme is the main option of the style:
+\begin{Verbatim}
+\usepackage[programme=dse]{slimthesis}
+\end{Verbatim}
+It determines the cover (logo, faculty and course), the language of the
+document and all the fixed labels, as summarised in
+Table~\ref{tab:programmes}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Values of the \texttt{programme} option.}
+  \label{tab:programmes}
+  \begin{tabular}{llll}
+    \toprule
+    Value & Degree & Programme & Language \\
+    \midrule
+    \texttt{inf} (default) & Bachelor's & Informatica & Italian \\
+    \texttt{inf-lm} & Master's & Informatica & Italian \\
+    \texttt{cs}     & Master's & Computer Science & English \\
+    \texttt{dse}    & Master's & Data Science for Economics & English \\
+    \texttt{dseh}   & Master's & Data Science for Economics and Health & English \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The language affects chapter labels (``Capitolo''/``Chapter''), the titles of
+the table of contents and of the bibliography, the names of theorem-like
+environments (Section~\ref{sec:theorems}) and the labels on the cover. If
+some passages are written in another language, add it to babel
+\emph{before} loading the style, and switch to it where needed:
+\begin{Verbatim}
+\PassOptionsToPackage{italian}{babel}
+\usepackage[programme=dse]{slimthesis}
+...
+\foreignlanguage{italian}{Questa frase è in italiano.}
+\end{Verbatim}
+
+The other options of the style are rarely needed:
+\begin{description}
+  \item[\texttt{madeinslim=false}] omits the closing ``Made in SLIM'' page;
+  \item[\texttt{pdfa=false}] produces an ordinary PDF file instead of a
+    PDF/A-2b one; links are then blue on screen and black in print
+    (Section~\ref{ch3});
+  \item[\texttt{fontdir=\textrm{\emph{dir}}}] directory containing the
+    Figtree fonts (default \nolinkurl{fonts/Figtree/});
+  \item[\texttt{mathfont=\textrm{\emph{name}}}] the OpenType math font
+    (default \texttt{STIX Two Math}). Any installed math font can be used,
+    for instance \texttt{Libertinus Math}, \texttt{Latin Modern Math} or
+    \texttt{TeX Gyre Pagella Math}; it is automatically scaled to match the
+    size of the text font;
+  \item[\texttt{logodir=\textrm{\emph{dir}}}] directory containing the cover
+    logos (default \nolinkurl{images/coverPage/});
+  \item[\texttt{licensedir=\textrm{\emph{dir}}}] directory containing the
+    Creative Commons buttons (default \nolinkurl{images/license/}).
+\end{description}
+Options are separated by commas; a font name containing spaces needs no
+quotes:
+\begin{Verbatim}
+\usepackage[programme=cs, mathfont=Libertinus Math]{slimthesis}
+\end{Verbatim}
+
+\section{Thesis data and cover} \label{sec:data}
+
+The cover is produced by \cs{maketitle}, using the data given in the
+preamble:
+\begin{Verbatim}
+\title{Learning Curves of Ensemble Classifiers}
+\author{Ada Lovelace}
+\academicyear{2025/26}
+\studentid{123456}
+\keywords{ensemble methods, random forests, learning curves}
+\supervisor{Prof.~Super Visor}
+\cosupervisor{Prof.~Cosu Pervisor}
+\cosupervisor{Dr.~Other Supervisor}
+\end{Verbatim}
+\cs{academicyear} only takes the years: ``Anno Accademico'' or ``Academic
+Year'' is added according to the language. \cs{studentid} is optional; when
+present, the student ID is printed below the author's name. \cs{keywords}
+is optional too: the keywords are not printed, but stored in the metadata of
+the PDF file, together with title, author and degree course, so that search
+engines and repositories can index the thesis.
+\cs{cosupervisor} can be repeated, or omitted: the label is singular or
+plural depending on the number of co-supervisors, and disappears if there
+are none. Write \verb|Prof.~| and \verb|Dr.~| with a tie, so that no
+sentence-ending space is added after the abbreviation and title and name
+stay on the same line.
+
+For the Informatica programmes the cover shows the official logo, which
+already contains faculty and course. For the other programmes the faculty
+and course are typeset under the university seal; interfaculty programmes
+(DSE and DSEH) list both faculties, at the same size. These lines can be
+changed with
+\begin{Verbatim}
+\faculty{Facoltà di Scienze e Tecnologie}
+\course{Master's Degree in Data Science\\for Economics and Health}
+\end{Verbatim}
+The first \cs{faculty} replaces the default faculties, further calls add
+lines. A course name that is too long is wrapped automatically; use
+\verb|\\| to choose where it breaks.
+
+\subsection{License} \label{sec:license}
+
+A thesis can be released under a license, which tells readers what they are
+allowed to do with it. The license is printed at the bottom of the page
+following the cover. For Creative Commons licenses, give their type:
+\begin{Verbatim}
+\license{by-sa}
+\end{Verbatim}
+The available types are listed in Table~\ref{tab:licenses}; an optional
+argument selects a version other than 4.0, as in \verb|\license[3.0]{by}|.
+The page shows the official button of the license, a copyright line with
+the current year and the author's name (except for CC0, which waives
+copyright), and the name and address of the license, in the language of
+the document. Any other license or notice can be given as free text:
+\begin{Verbatim}
+\customlicense{\textcopyright\ 2026 Ada Lovelace. All rights reserved.}
+\end{Verbatim}
+Without \cs{license} or \cs{customlicense}, the page is omitted.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Creative Commons licenses available through \cs{license}.}
+  \label{tab:licenses}
+  \begin{tabular}{ll}
+    \toprule
+    Type & License \\
+    \midrule
+    \texttt{by}       & Attribution \\
+    \texttt{by-sa}    & Attribution-ShareAlike \\
+    \texttt{by-nd}    & Attribution-NoDerivatives \\
+    \texttt{by-nc}    & Attribution-NonCommercial \\
+    \texttt{by-nc-sa} & Attribution-NonCommercial-ShareAlike \\
+    \texttt{by-nc-nd} & Attribution-NonCommercial-NoDerivatives \\
+    \texttt{zero}     & CC0 (public domain dedication) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Structure of the document} \label{sec:structure}
+
+The body of \texttt{main.tex} follows the usual structure of a book:
+\begin{Verbatim}
+\begin{document}
+\frontmatter
+\maketitle
+\input{frontmatter/dedication}
+\input{frontmatter/epigraph}
+\input{frontmatter/acknowledgements}
+\tableofcontents
+\listoffigures
+\listoftables
+\listofalgorithms
+\input{frontmatter/symbols}
+
+\mainmatter
+\include{chapters/introduction}
+\include{chapters/c1}
+...
+\include{chapters/conclusions}
+
+\appendix
+\include{chapters/appendix}
+
+\printthesisbibliography
+\end{document}
+\end{Verbatim}
+Pages in the front matter are numbered with roman numerals and have no
+running header; \cs{mainmatter} restarts the numbering from 1 and switches
+on headers and one-and-a-half line spacing; \cs{appendix} starts the
+appendices (Appendix~\ref{app:appendices}). The lists of figures, tables
+and algorithms, produced by \cs{listoffigures}, \cs{listoftables} and
+\cs{listofalgorithms}, collect their captions with the page numbers, and
+are themselves listed in the table of contents. They are optional: remove
+the corresponding line if the thesis has few figures, tables or
+algorithms. A caption that
+is too long for these lists can be given a shorter version as optional
+argument, which is used in the lists in place of the full caption:
+\begin{Verbatim}
+\caption[Learning curves]{Learning curves: F1 score on the test set ...}
+\end{Verbatim}
+
+\subsection{Front matter}
+
+The dedication and the epigraph have their own commands, which typeset them
+on a separate page:
+\begin{Verbatim}
+\dedication{To my family.}
+\epigraphpage{The best way to predict the future\\
+          is to invent it.}{--- Alan Kay}
+\end{Verbatim}
+Both are optional: remove the corresponding \cs{input} line in
+\texttt{main.tex} if you do not want them. The acknowledgements are an
+unnumbered chapter, described next.
+
+\subsection{List of symbols} \label{sec:symbols}
+
+A thesis with much notation benefits from a list of symbols, placed after
+the other lists. It is written by hand in \nolinkurl{frontmatter/symbols.tex},
+with one \cs{item} per symbol inside the \texttt{listofsymbols}
+environment, which starts an unnumbered chapter titled ``List of Symbols''
+(``Elenco dei simboli'' in Italian) and aligns the meanings in a column:
+\begin{Verbatim}
+\begin{listofsymbols}
+  \item[$\R$]                 the set of real numbers
+  \item[$\bx_i$]              the $i$-th point of a dataset
+  \item[$\lVert \bx \rVert$]  Euclidean norm of $\bx$
+\end{listofsymbols}
+\end{Verbatim}
+Symbols are listed in the order in which they are written, so that related
+notation can be kept together. The column of symbols is 2.5\,cm wide; a
+different width can be given as optional argument, as in
+\verb|\begin{listofsymbols}[4cm]|. If the list is not needed, remove from
+\texttt{main.tex} the line that inputs \nolinkurl{frontmatter/symbols.tex}.
+
+\subsection{Unnumbered chapters and sections}
+
+The starred commands \verb|\chapter*|, \verb|\section*| and
+\verb|\subsection*| produce headings without number. Unlike standard
+\LaTeX{}, they are nevertheless listed in the table of contents, and
+\verb|\chapter*| also sets the running header. Unnumbered chapters are the
+right choice for the introduction, the acknowledgements and the
+conclusions:
+\begin{Verbatim}
+\chapter*{Acknowledgements}
+\section*{Requirements}
+\end{Verbatim}
+As for numbered headings, an optional argument gives a shorter title for
+the table of contents and the header:
+\verb|\chapter*[Notation]{Notation and abbreviations}|. An unnumbered
+chapter, such as the introduction, should not contain sections: use
+\cs{paragraph} headings instead, which start a paragraph and are not listed
+in the table of contents, as in the Introduction of this document.
+
+\subsection{Chapters}
+
+Each chapter is a separate file in \texttt{chapters/}, included with
+\cs{include}. To add a chapter, create the file and add the corresponding
+line to \texttt{main.tex}. To compile only the chapter you are working on,
+add \cs{includeonly}\verb|{chapters/c2}| to the preamble: page numbers and
+references to the other chapters are preserved.
+
+\subsection{Two-sided printing} \label{sec:twoside}
+
+The template is set up for one-sided printing, which is the most common
+choice for a thesis. For a thesis printed on both sides of the sheet,
+replace \texttt{oneside} with \texttt{twoside} in the first line of
+\texttt{main.tex}:
+\begin{Verbatim}
+\documentclass[12pt, a4paper, twoside]{book}
+\end{Verbatim}
+The style then adapts the layout: running headers and page numbers move to
+the outer side of the page, on the left of even pages and on the right of
+odd ones; chapters, as well as dedication, epigraph and lists, start on a
+right-hand page, and the pages left blank for this reason have neither
+header nor page number; the license is printed on the back of the cover,
+and the ``Made in SLIM'' page on the back cover. If the sheets are bound,
+some space can be reserved for the binding on the inner side of the pages,
+adding to the preamble, for instance, \verb|\geometry{bindingoffset=1cm}|.

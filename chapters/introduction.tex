@@ -1,0 +1,83 @@
+\chapter*{Introduction}
+
+This document is at the same time the documentation and an example of
+\texttt{slimthesis}, a \LaTeX{} style for bachelor's and master's theses
+supervised at the SLIM laboratory of the Università degli Studi di Milano.
+Its source is the starting point for a new thesis: replace the text of the
+chapters with your own, keep the structure, and the style takes care of the
+cover page, the typography and the bibliography.
+
+All the layout is in a single file, \texttt{slimthesis.sty}. The document
+itself (\texttt{main.tex} and the files it includes) only contains the thesis
+data and the text, so that the style can be updated without touching your
+work, and your work never needs to touch the style.
+
+\paragraph{Requirements}
+
+The style relies on OpenType fonts, therefore it must be compiled with
+\emph{LuaLaTeX} or \emph{XeLaTeX}; pdf\LaTeX{} is not supported. Besides a
+recent \TeX{} Live distribution, you need:
+\begin{itemize}
+  \item the \emph{STIX Two Math} font, used for mathematics (the Fedora
+    package is \nolinkurl{stix-fonts});
+  \item the \emph{Libertinus} fonts, used for text (the
+    Fedora package is \nolinkurl{texlive-libertinus-fonts});
+  \item the \emph{Figtree} font, used for headings, which is shipped with the
+    template in \nolinkurl{fonts/Figtree/};
+  \item a few \LaTeX{} packages that minimal installations may lack, such as
+    \texttt{apptools}, \texttt{ocgx2} and \texttt{pdfx} (on Fedora:
+    \nolinkurl{texlive-apptools}, \nolinkurl{texlive-ocgx2} and
+    \nolinkurl{texlive-pdfx});
+  \item \emph{biber}, which processes the bibliography.
+\end{itemize}
+
+\paragraph{Compiling}
+
+A complete build runs LuaLaTeX, then biber, then LuaLaTeX twice more, so
+that the bibliography, the table of contents and all cross-references are
+resolved:
+\begin{Verbatim}
+lualatex main && biber main && lualatex main && lualatex main
+\end{Verbatim}
+Alternatively, \texttt{latexmk} runs all the required steps automatically;
+the file \texttt{latexmkrc} shipped with the template tells it to use
+LuaLaTeX and biber, so that it is enough to type
+\begin{Verbatim}
+latexmk main
+\end{Verbatim}
+and \verb|latexmk -c| removes the auxiliary files. XeLaTeX can be used in
+the same way, replacing \texttt{lualatex} with \texttt{xelatex}.
+
+\paragraph{PDF/A}
+
+The thesis is produced as a PDF/A-2b file, the archival format usually
+required when the final version is deposited, through the \texttt{pdfx}
+package. The title, the author, the degree course and the keywords given
+with \cs{keywords} are stored in the metadata of the file; the style writes
+them in the file \texttt{main.xmpdata}, read by \texttt{pdfx}, which is
+regenerated at each compilation and should not be edited. Conformance can be
+checked with the free validator veraPDF (\url{https://verapdf.org}). The
+option \texttt{pdfa=false} produces an ordinary PDF file instead
+(Section~\ref{sec:programme}).
+
+\paragraph{Files}
+
+\begin{description}
+  \item[\texttt{main.tex}] the main file: programme, thesis data and the list
+    of chapters;
+  \item[\texttt{slimthesis.sty}] the style; normally it does not need to be
+    modified;
+  \item[\texttt{frontmatter/}] dedication, epigraph and acknowledgements;
+  \item[\texttt{chapters/}] one file per chapter;
+  \item[\texttt{bibliography.bib}] the bibliographic references;
+  \item[\texttt{style/}] your own macros (\texttt{symbols.tex}) and the
+    colours used by the figures (\texttt{colors.tex});
+  \item[\texttt{images/}] figures, the logos used on the cover
+    (\texttt{images/coverPage/}) and the Creative Commons buttons
+    (\texttt{images/license/});
+  \item[\texttt{fonts/}] the Figtree font.
+\end{description}
+
+Chapter~\ref{ch1} explains how to set up the thesis, Chapter~\ref{ch2} how
+to write it, Chapter~\ref{ch3} how to cite and link, and the last chapter
+lists a few checks to do before submitting.

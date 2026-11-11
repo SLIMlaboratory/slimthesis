@@ -1,0 +1,802 @@
+%% slimthesis.sty
+%% Thesis style: Libertinus + Figtree typography, custom chapter heads,
+%% fancy headers, theorem environments, cover page.
+%%
+%% Copyright (c) 2026 Dario Malchiodi and SLIM laboratory,
+%% Università degli Studi di Milano
+%% SPDX-License-Identifier: MIT (see the file LICENSE)
+%%
+%% Requires LuaLaTeX or XeLaTeX (fontspec / unicode-math); PDF/A-2b output
+%% through the pdfx package.
+%%
+%% Package options (key=value):
+%%   programme=<id>  degree programme; sets cover, language and labels:
+%%       inf     Laurea in Informatica                          (default, Italian)
+%%       inf-lm  Laurea Magistrale in Informatica               (Italian)
+%%       cs      Master's Degree in Computer Science            (English)
+%%       dse     Master's Degree in Data Science for Economics  (English)
+%%       dseh    Master's Degree in Data Science for Economics
+%%               and Health                                     (English)
+%%   madeinslim=false  omit the closing "Made in SLIM" page
+%%   pdfa=false      produce an ordinary PDF instead of PDF/A-2b
+%%   fontdir=<dir>   where the Figtree .ttf files live   (default: fonts/Figtree/)
+%%   logodir=<dir>   where the cover logos live          (default: images/coverPage/)
+%%   licensedir=<dir> where the Creative Commons buttons live (default: images/license/)
+%%   mathfont=<name> OpenType math font (default: STIX Two Math), e.g.
+%%                   Libertinus Math, Latin Modern Math, TeX Gyre Pagella Math
+%%
+%% Document-level interface:
+%%   \title{..} \author{..}
+%%   \academicyear{2025/26}             printed as "Anno Accademico"/"Academic Year ..."
+%%   \studentid{..}                     matricola (optional, printed on the cover)
+%%   \keywords{..}                      keywords, stored in the PDF metadata (optional)
+%%   \supervisor{..}                    relatore / advisor
+%%   \cosupervisor{..}                  correlatore / co-advisor (repeatable; 0, 1 or more)
+%%   \faculty{..} \course{..}           override the programme's faculty (repeatable)
+%%                                      and course lines on the cover
+%%   \maketitle                         typesets the cover page (and license page)
+%%   \license[<version>]{<type>}        Creative Commons license: by, by-sa, by-nd,
+%%                                      by-nc, by-nc-sa, by-nc-nd (version 4.0 by
+%%                                      default), or zero (CC0 public domain)
+%%   \customlicense{..}                 any other license or copyright notice
+%%   \dedication{..}  \epigraphpage{quote}{author}
+%%   listofsymbols environment          list of symbols: \item[<symbol>] <meaning>
+%%   \chapter* \section* \subsection*   unnumbered, but listed in the TOC
+%%   \printthesisbibliography           bibliography as an unnumbered chapter
+%%   \frontmatter / \mainmatter         as in book, with the style resets
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{slimthesis}[2026/11/10 v1.1 SLIM thesis style]
+
+% ---------------------------------------------------------------------------
+% Options
+% ---------------------------------------------------------------------------
+\def\slim@programme{inf}
+\def\slim@fontdir{fonts/Figtree/}
+\def\slim@logodir{images/coverPage/}
+\def\slim@licensedir{images/license/}
+\def\slim@mathfont{STIX Two Math}
+\newif\ifslim@madeinslim \slim@madeinslimtrue
+\newif\ifslim@pdfa \slim@pdfatrue
+\DeclareKeys[slimthesis]{
+  madeinslim.if   = slim@madeinslim,
+  pdfa.if         = slim@pdfa,
+  programme.store = \slim@programme,
+  fontdir.store   = \slim@fontdir,
+  logodir.store   = \slim@logodir,
+  licensedir.store = \slim@licensedir,
+  mathfont.store  = \slim@mathfont,
+}
+\ProcessKeyOptions[slimthesis]
+
+\RequirePackage{iftex}
+\RequireTUTeX % fontspec/unicode-math need XeLaTeX or LuaLaTeX
+\RequirePackage{etoolbox}
+
+% ---------------------------------------------------------------------------
+% Degree programmes
+%   \slim@lang        babel main language
+%   \slim@ifmaster    master's (true) or bachelor's (false) degree
+%   \slim@logo        cover logo; if it already contains faculty and course
+%                     (\slim@logohasheadertrue) no text lines are added
+%   \slim@faculties   faculty lines, \slim@course course line
+% ---------------------------------------------------------------------------
+\newif\ifslim@master
+\newif\ifslim@logohasheader
+\def\slim@faculties{}
+\def\slim@course{}
+\newcommand{\slim@addfaculty}[1]{\appto\slim@faculties{\slim@facultyline{#1}}}
+\def\slim@fst{FACOLTÀ DI SCIENZE E TECNOLOGIE}
+\def\slim@fspes{FACOLTÀ DI SCIENZE POLITICHE, ECONOMICHE E SOCIALI}
+
+\ifdefstring{\slim@programme}{inf}{%
+  \def\slim@lang{italian}\slim@masterfalse
+  \def\slim@logo{logo_informatica}\slim@logohasheadertrue
+  \slim@addfaculty{\slim@fst}%
+  \def\slim@course{Corso di Laurea in Informatica}%
+}{%
+\ifdefstring{\slim@programme}{inf-lm}{%
+  \def\slim@lang{italian}\slim@mastertrue
+  \def\slim@logo{logo_informatica_magistrale}\slim@logohasheadertrue
+  \slim@addfaculty{\slim@fst}%
+  \def\slim@course{Corso di Laurea Magistrale in Informatica}%
+}{%
+\ifdefstring{\slim@programme}{cs}{%
+  \def\slim@lang{english}\slim@mastertrue
+  \def\slim@logo{logo_unimi}\slim@logohasheaderfalse
+  \slim@addfaculty{\slim@fst}%
+  \def\slim@course{Master's Degree in Computer Science}%
+}{%
+\ifdefstring{\slim@programme}{dse}{%
+  \def\slim@lang{english}\slim@mastertrue
+  \def\slim@logo{logo_unimi}\slim@logohasheaderfalse
+  \slim@addfaculty{\slim@fst}\slim@addfaculty{\slim@fspes}%
+  \def\slim@course{Master's Degree in Data Science for Economics}%
+}{%
+\ifdefstring{\slim@programme}{dseh}{%
+  \def\slim@lang{english}\slim@mastertrue
+  \def\slim@logo{logo_unimi}\slim@logohasheaderfalse
+  \slim@addfaculty{\slim@fst}\slim@addfaculty{\slim@fspes}%
+  \def\slim@course{Master's Degree in Data Science\\for Economics and Health}%
+}{%
+  \PackageError{slimthesis}{Unknown programme `\slim@programme'}%
+    {Use one of: inf, inf-lm, cs, dse, dseh.}%
+  \def\slim@lang{italian}\slim@masterfalse
+  \def\slim@logo{logo_unimi}\slim@logohasheaderfalse
+}}}}}
+
+% User overrides: the first \faculty replaces the programme's faculties
+\newif\ifslim@userfaculty
+\newcommand{\faculty}[1]{%
+  \ifslim@userfaculty\else\def\slim@faculties{}\slim@userfacultytrue\fi
+  \slim@addfaculty{#1}%
+  \slim@logohasheaderfalse\def\slim@logo{logo_unimi}}
+\newcommand{\course}[1]{%
+  \def\slim@course{#1}%
+  \slim@logohasheaderfalse\def\slim@logo{logo_unimi}}
+
+% ---------------------------------------------------------------------------
+% Language-dependent strings
+% ---------------------------------------------------------------------------
+\ifdefstring{\slim@lang}{italian}{%
+  \def\slim@str@supervisor{Relatore}%
+  \def\slim@str@cosupervisor{Correlatore}%
+  \def\slim@str@cosupervisors{Correlatori}%
+  \def\slim@str@studentid{Matricola}%
+  \def\slim@str@year{Anno Accademico}%
+  \def\slim@str@workby{\ifslim@master Tesi di Laurea di\else Elaborato Finale di\fi}%
+  \def\slim@str@thm{Teorema}\def\slim@str@proof{Dimostrazione}%
+  \def\slim@str@defn{Definizione}\def\slim@str@fact{Fatto}%
+  \def\slim@str@lem{Lemma}\def\slim@str@cor{Corollario}%
+  \def\slim@str@prop{Proposizione}%
+  \def\slim@str@algorithm{Algoritmo}%
+  \def\slim@str@listofalgorithms{Elenco degli algoritmi}%
+  \def\slim@str@listofsymbols{Elenco dei simboli}%
+}{%
+  \def\slim@str@supervisor{Advisor}%
+  \def\slim@str@cosupervisor{Co-advisor}%
+  \def\slim@str@cosupervisors{Co-advisors}%
+  \def\slim@str@studentid{Student ID}%
+  \def\slim@str@year{Academic Year}%
+  \def\slim@str@workby{Thesis by}%
+  \def\slim@str@thm{Theorem}\def\slim@str@proof{Proof}%
+  \def\slim@str@defn{Definition}\def\slim@str@fact{Fact}%
+  \def\slim@str@lem{Lemma}\def\slim@str@cor{Corollary}%
+  \def\slim@str@prop{Proposition}%
+  \def\slim@str@algorithm{Algorithm}%
+  \def\slim@str@listofalgorithms{List of Algorithms}%
+  \def\slim@str@listofsymbols{List of Symbols}%
+}
+
+% ---------------------------------------------------------------------------
+% Language, utilities
+% ---------------------------------------------------------------------------
+% Main language from the programme; extra languages can be added with
+% \PassOptionsToPackage{...}{babel} before \usepackage{slimthesis}
+\RequirePackage[\slim@lang]{babel}
+\RequirePackage{csquotes}
+\RequirePackage{calc}
+\RequirePackage{graphicx}
+\RequirePackage{array}
+\RequirePackage{tabularx}
+\RequirePackage[dvipsnames,svgnames,table]{xcolor}
+
+% ---------------------------------------------------------------------------
+% Page layout
+% ---------------------------------------------------------------------------
+\RequirePackage[a4paper, inner=2.5cm, outer=2.5cm,
+                marginparwidth=0pt, marginparsep=0pt]{geometry}
+\RequirePackage{setspace}
+\hyphenpenalty=200
+% extra pass for paragraphs that cannot be justified otherwise (e.g. long
+% URLs or code), instead of letting lines run into the margin
+\setlength{\emergencystretch}{1.5em}
+
+% ---------------------------------------------------------------------------
+% Math (amssymb before unicode-math so the latter wins)
+% ---------------------------------------------------------------------------
+\RequirePackage{amsmath, amssymb, amsthm}
+\RequirePackage{mathtools}
+
+% ---------------------------------------------------------------------------
+% Fonts
+% ---------------------------------------------------------------------------
+\RequirePackage{fontspec}
+\setmainfont{Libertinus Serif}
+\RequirePackage{unicode-math}
+% math font scaled to the x-height of the text font, so that the two match
+\setmathfont{\slim@mathfont}[Scale=MatchLowercase]
+\newfontfamily{\titlefont}[Ligatures=TeX]{Libertinus Serif}
+\newfontfamily{\headingfont}[
+    Path       = \slim@fontdir,
+    Ligatures  = TeX,
+    BoldFont   = Figtree-Bold.ttf,
+    ItalicFont = Figtree-Italic.ttf
+]{Figtree-Regular.ttf}
+\RequirePackage{microtype}
+
+% ---------------------------------------------------------------------------
+% Lists: labels aligned with the left margin of the text; dashes instead
+% of bullets
+% ---------------------------------------------------------------------------
+\RequirePackage{enumitem}
+\setlist[itemize]{leftmargin=*}
+\setlist[itemize,1]{label=\textendash}
+\setlist[itemize,2]{label=\textendash}
+\setlist[itemize,3]{label=\textendash}
+\setlist[itemize,4]{label=\textendash}
+\setlist[enumerate]{leftmargin=*}
+
+% ---------------------------------------------------------------------------
+% Captions, URLs
+% ---------------------------------------------------------------------------
+\RequirePackage{caption}
+\captionsetup[table]{aboveskip=10pt}
+% Algorithms (if the document loads the algorithm and algpseudocode
+% packages): heading in the language of the programme, Input/Output instead
+% of Require/Ensure
+\AtBeginDocument{%
+  \@ifpackageloaded{algorithm}{%
+    \floatname{algorithm}{\slim@str@algorithm}%
+    \renewcommand{\listalgorithmname}{\slim@str@listofalgorithms}%
+    % list of algorithms: same look as the other lists
+    \let\slim@listofalgorithms\listofalgorithms
+    \renewcommand{\listofalgorithms}{%
+      \begingroup\slim@tocfont
+      \slim@listofalgorithms
+      \endgroup
+      \clearpage}}{}%
+  \@ifpackageloaded{algpseudocode}{%
+    \algrenewcommand{\algorithmicrequire}{\textbf{Input:}}%
+    \algrenewcommand{\algorithmicensure}{\textbf{Output:}}}{}}
+
+% \subref prints subfigure labels as (a), (b), ... like their captions
+% (subcaption is loaded by the document, so this is applied when it starts)
+\AtBeginDocument{\@ifpackageloaded{subcaption}
+  {\captionsetup[sub]{subrefformat=parens}}{}}
+% URLs break only after / . - _ and similar characters, never inside words
+\RequirePackage[hyphens]{url}
+% a little stretch between URL characters, so lines ending in a URL justify
+\Urlmuskip=0mu plus 1mu
+
+% ---------------------------------------------------------------------------
+% Theorems (names follow the programme's language)
+% ---------------------------------------------------------------------------
+\theoremstyle{definition}
+% each numbered environment has its own counter, reset at each chapter
+% and printed as <chapter>.<number> (e.g. Definition 2.3, Theorem 2.1)
+\newtheorem{thm}{\slim@str@thm}[chapter]
+\renewcommand{\qedsymbol}{\ensuremath{\square}}
+\newtheorem{defn}{\slim@str@defn}[chapter]
+\newtheorem*{defn*}{\slim@str@defn}
+\newtheorem{fact}{\slim@str@fact}[chapter]
+\newtheorem{lem}{\slim@str@lem}[chapter]
+\newtheorem{cor}{\slim@str@cor}[chapter]
+\newtheorem{prop}{\slim@str@prop}[chapter]
+
+% ---------------------------------------------------------------------------
+% Sectioning
+% ---------------------------------------------------------------------------
+\RequirePackage[explicit]{titlesec}
+\RequirePackage{apptools}
+
+\titleformat{\chapter}[block]
+    {\bfseries\Huge\headingfont}
+    {%
+        \rlap{%
+            \parbox{\textwidth-0.28cm}{%
+                \vspace{-1.7ex}
+                {\color{Gainsboro}\LARGE
+                 \MakeUppercase{\IfAppendix{\appendixname}{\chaptername}}}
+                \raggedleft\color{Gainsboro}\scalebox{4}{\thechapter}%
+            }%
+        }%
+    }
+    {-0.46cm}
+    {\color{DimGray}%
+     \begin{tabular}{@{}>{\raggedright\arraybackslash}b{0.6\linewidth}
+                                     >{\raggedleft\arraybackslash}p{\dimexpr0.4\linewidth-2\tabcolsep}@{}}
+        \parbox[b][2cm][b]{\linewidth}{\raggedright #1} &
+     \end{tabular}}
+    [\vspace{1ex}\titlerule\vspace{16pt}]
+\titlespacing{\chapter}{0pt}{0pt}{0.2cm}
+
+\titleformat{\section}
+    {\color{DimGray}\bfseries\Large\headingfont}
+    {}{0pt}{\thesection\hspace{0.5cm}#1}[]
+
+\titleformat{\subsection}
+    {\color{DimGray}\bfseries\large\headingfont}
+    {}{0pt}{\thesubsection\hspace{0.5cm}#1}[]
+
+% paragraph headings: run-in, in the heading font like the other levels
+% (never numbered)
+\titleformat{\paragraph}[runin]
+    {\color{DimGray}\bfseries\normalsize\headingfont}
+    {}{0pt}{#1}
+\titlespacing*{\paragraph}{0pt}{3.25ex plus 1ex minus .2ex}{1em}
+
+% starred (numberless) versions: same look, without the number
+\titleformat{name=\section,numberless}
+    {\color{DimGray}\bfseries\Large\headingfont}
+    {}{0pt}{#1}[]
+
+\titleformat{name=\subsection,numberless}
+    {\color{DimGray}\bfseries\large\headingfont}
+    {}{0pt}{#1}[]
+
+% ---------------------------------------------------------------------------
+% Table of contents
+% ---------------------------------------------------------------------------
+% The standard entries of the book class are used (tocloft is not: it
+% prevents hyperlinks in the table of contents when \DocumentMetadata is
+% given). Entries are typeset in the heading font; since the standard
+% entries reset the font of page numbers with \normalfont, the latter
+% selects the heading font inside the table of contents and the lists.
+\setcounter{tocdepth}{2} % hide subsubsections
+\newcommand{\slim@tocfont}{%
+  \onehalfspacing\headingfont
+  \renewcommand{\normalfont}{\headingfont\mdseries\upshape}}
+
+% TOC in heading font, 1.5 spacing, no page number on its pages
+\let\slim@tableofcontents\tableofcontents
+\renewcommand{\tableofcontents}{%
+  \begingroup\slim@tocfont\slim@starintocfalse
+  \slim@tableofcontents
+  \endgroup
+  \thispagestyle{empty}%
+  \clearpage}
+\AtBeginDocument{\addtocontents{toc}{\protect\thispagestyle{empty}}}
+% Lists of figures and tables: same look as the table of contents, each
+% starting on a new page; unlike the table of contents, they are listed in it
+\let\slim@listoffigures\listoffigures
+\renewcommand{\listoffigures}{%
+  \begingroup\slim@tocfont
+  \slim@listoffigures
+  \endgroup
+  \clearpage}
+\let\slim@listoftables\listoftables
+\renewcommand{\listoftables}{%
+  \begingroup\slim@tocfont
+  \slim@listoftables
+  \endgroup
+  \clearpage}
+
+% ---------------------------------------------------------------------------
+% Headers and footers
+% ---------------------------------------------------------------------------
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headsep}{0.8cm}
+\renewcommand{\chaptermark}[1]{\markboth{\small\emph{\@chapapp\ \thechapter:\ #1}}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+% header and page number on the outer side of the page: always on the right
+% in one-sided documents, alternating in two-sided ones (class option twoside)
+\fancyhead[RO,LE]{\leftmark\vspace{0.2cm}}
+\fancyfoot[RO,LE]{\thepage}
+\renewcommand{\headrulewidth}{0.01pt}
+
+\fancypagestyle{chapterpage}{%
+  \fancyhf{}%
+  \fancyfoot[RO,LE]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+
+% Two-sided documents: the pages left blank so that a chapter starts on a
+% right-hand page have neither header nor page number
+\renewcommand{\cleardoublepage}{%
+  \clearpage
+  \if@twoside
+    \ifodd\c@page\else
+      \hbox{}\thispagestyle{empty}\newpage
+    \fi
+  \fi}
+\assignpagestyle{\chapter}{chapterpage}
+
+% Unnumbered chapters, sections and subsections (\chapter*, \section*,
+% \subsection*) are listed in the table of contents like numbered ones;
+% \chapter* also sets the running header. An optional argument gives a
+% shorter title for the table of contents and the header. The title of the
+% table of contents itself is excluded (see \slim@starintocfalse in
+% \tableofcontents); \slim@nostartoc excludes any other.
+\newif\ifslim@starintoc \slim@starintoctrue
+\newcommand{\slim@nostartoc}[1]{%
+  \begingroup\slim@starintocfalse #1\endgroup}
+\NewCommandCopy{\slim@chapter}{\chapter}
+\RenewDocumentCommand{\chapter}{s o m}{%
+  \IfBooleanTF{#1}
+    {\slim@chapter*{#3}%
+     \ifslim@starintoc
+       \IfValueTF{#2}{\def\slim@tmp{#2}}{\def\slim@tmp{#3}}%
+       \addcontentsline{toc}{chapter}{\slim@tmp}%
+       \markboth{\small\emph{\slim@tmp}}{}%
+     \fi}
+    {\IfValueTF{#2}{\slim@chapter[#2]{#3}}{\slim@chapter{#3}}}}
+\newcommand{\slim@starredsection}[1]{% #1 = section or subsection
+  \expandafter\NewCommandCopy\csname slim@#1\expandafter\endcsname
+    \csname #1\endcsname
+  \expandafter\RenewDocumentCommand\csname #1\endcsname{s o m}{%
+    \IfBooleanTF{##1}
+      {\csname slim@#1\endcsname*{##3}%
+       \ifslim@starintoc
+         \addcontentsline{toc}{#1}{\IfValueTF{##2}{##2}{##3}}%
+       \fi}
+      {\IfValueTF{##2}{\csname slim@#1\endcsname[##2]{##3}}
+                      {\csname slim@#1\endcsname{##3}}}}}
+\slim@starredsection{section}
+\slim@starredsection{subsection}
+
+% Front matter: no headers; main matter: fancy headers, 1.5 spacing
+\appto\frontmatter{\pagestyle{empty}}
+\appto\mainmatter{\restoregeometry\pagestyle{fancy}\onehalfspacing}
+
+% ---------------------------------------------------------------------------
+% Hyperlinks (loaded at the end of the preamble; registered before
+% biblatex, so that biblatex sees hyperref and links citations and DOIs)
+% ---------------------------------------------------------------------------
+% PDF metadata, from the thesis data: title, author, subject (the degree
+% course), keywords and language; a line break \\ in title or course
+% becomes a space
+\def\slim@keywords{}
+\newcommand{\keywords}[1]{\def\slim@keywords{#1}}
+\newcommand{\slim@metadata}{%
+  \begingroup
+  \def\\{\space}%
+  \let\@latex@error\@gobbletwo % no error (and empty title) without \title
+  \protected@xdef\slim@pdftitle{\@title}%
+  \protected@xdef\slim@pdfauthor{\@author}%
+  \protected@xdef\slim@pdfsubject{\slim@course}%
+  \endgroup
+  \ifdefstring{\slim@lang}{italian}{\def\slim@pdflang{it}}{\def\slim@pdflang{en}}}
+
+% PDF/A-2b (unless pdfa=false) through the pdfx package, which reads the
+% metadata from \jobname.xmpdata: the file is written here, at the end of
+% the preamble, when the thesis data are known
+\newwrite\slim@xmpdata
+\newcommand{\slim@writexmpdata}{%
+  \immediate\openout\slim@xmpdata=\jobname.xmpdata
+  \immediate\write\slim@xmpdata{%
+    \string\Title{\unexpanded\expandafter{\slim@pdftitle}}^^J%
+    \string\Author{\unexpanded\expandafter{\slim@pdfauthor}}^^J%
+    \string\Subject{\unexpanded\expandafter{\slim@pdfsubject}}^^J%
+    \string\Keywords{\unexpanded\expandafter{\slim@keywords}}^^J%
+    \string\Language{\slim@pdflang}}%
+  \immediate\closeout\slim@xmpdata}
+
+% Links in SLIM blue. In a PDF/A file they are blue also in print; otherwise
+% (pdfa=false) they are blue on screen and black in print, through optional
+% content groups, which PDF/A forbids. ocgx2 is used instead of hyperref's
+% own ocgcolorlinks because it lets links break across lines.
+\definecolor{slimblue}{HTML}{00346D}
+\AtEndPreamble{%
+  \slim@metadata
+  \ifslim@pdfa
+    \slim@writexmpdata
+    % with LuaLaTeX, pdfx needs \pdfminorversion & co. defined beforehand
+    \ifluatex\RequirePackage{luatex85}\fi
+    \RequirePackage[a-2b]{pdfx}% loads hyperref, sets all the metadata
+  \else
+    \RequirePackage{hyperref}%
+  \fi
+  \ifslim@pdfa
+    \hypersetup{colorlinks=true}%
+  \else
+    \RequirePackage[ocgcolorlinks]{ocgx2}%
+  \fi
+  \RequirePackage{hypcap}%
+  \hypersetup{
+    citecolor=slimblue,
+    filecolor=slimblue,
+    linkcolor=slimblue,
+    urlcolor=slimblue
+  }%
+  \ifslim@pdfa\else
+    \hypersetup{
+      pdftitle={\slim@pdftitle},
+      pdfauthor={\slim@pdfauthor},
+      pdfsubject={\slim@pdfsubject},
+      pdfkeywords={\slim@keywords},
+      pdflang=\slim@pdflang,
+    }%
+  \fi}
+
+% ---------------------------------------------------------------------------
+% Bibliography
+% ---------------------------------------------------------------------------
+% Author-year citations with natbib commands:
+%   \citep -> (Surname, year), \citet -> Surname (year), \citealp, \citeauthor, \citeyear ...
+\RequirePackage[style=authoryear, natbib=true, sorting=nyt, maxcitenames=2,
+                uniquename=false, uniquelist=false, dashed=false]{biblatex} % more options: \PassOptionsToPackage
+\DeclareDelimFormat[parencite]{nameyeardelim}{\addcomma\space}
+% Entries without hanging indent, separated by a vertical space; lines
+% inside an entry are set at 1.25 spacing (body text uses 1.5), so that
+% each entry reads as a block
+\setlength{\bibhang}{0pt}
+\setlength{\bibitemsep}{10pt}
+% Link of each entry (DOI as https://doi.org/..., otherwise its URL) printed
+% after the final period, unbroken and flush right: on the last line if it
+% fits, otherwise on a line of its own. When a DOI is present the url field
+% is dropped, to avoid two links to the same work.
+\DeclareFieldFormat{doi}{%
+  \ifhyperref
+    {\href{https://doi.org/#1}{\nolinkurl{https://doi.org/#1}}}
+    {\nolinkurl{https://doi.org/#1}}}
+\DeclareFieldFormat{url}{\url{#1}}
+\AtEveryBibitem{%
+  \iffieldundef{doi}{}{\clearfield{url}\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}}
+\renewbibmacro*{doi+eprint+url}{%
+  \iftoggle{bbx:eprint}{\usebibmacro{eprint}}{}}
+\newcommand{\slim@bibflushright}[1]{%
+  \unskip\nobreak\hfil\penalty50\hskip2em\hbox{}\nobreak\hfill
+  \mbox{#1}{\parfillskip=0pt\par}}
+% No penalty for a hyphen on the second-to-last line of an entry, otherwise
+% TeX moves the link to a new line just to avoid it
+\AtBeginBibliography{\finalhyphendemerits=0 \setstretch{1.25}}
+\renewbibmacro*{finentry}{%
+  \finentry
+  \iffieldundef{doi}
+    {\iffieldundef{url}{}{\slim@bibflushright{\printfield{url}}}}
+    {\slim@bibflushright{\printfield{doi}}}}
+\newcommand{\printthesisbibliography}{%
+  \chapter*{\bibname}%
+  \printbibliography[heading=none]}
+
+% ---------------------------------------------------------------------------
+% Front-matter pages
+% ---------------------------------------------------------------------------
+\RequirePackage{epigraph}
+
+\newcommand{\dedication}[1]{%
+  \cleardoublepage
+  \thispagestyle{empty}%
+  \vspace*{0.3\textheight}%
+  \begin{flushright}
+    \begin{minipage}{0.5\textwidth}\itshape #1\end{minipage}
+  \end{flushright}
+  \vfill}
+
+\newcommand{\epigraphpage}[2]{%
+  \cleardoublepage
+  \thispagestyle{empty}%
+  \vspace*{0.3\textheight}%
+  \begingroup
+  \setlength{\epigraphwidth}{0.45\textwidth}%
+  \setlength{\epigraphrule}{0pt}%
+  \epigraph{\textit{\enquote{#1}}}{#2}%
+  \endgroup
+  \vfill}
+
+% List of symbols: an unnumbered chapter (listed in the table of contents)
+% with one \item[<symbol>]<meaning> per symbol; the optional argument is the
+% width of the column of symbols
+\newenvironment{listofsymbols}[1][2.5cm]{%
+  \chapter*{\slim@str@listofsymbols}%
+  \begin{description}[font=\normalfont, align=left, labelwidth=#1,
+                      labelsep=1em, leftmargin=\dimexpr #1+1em\relax,
+                      itemsep=0.25\baselineskip]}
+  {\end{description}}
+
+% ---------------------------------------------------------------------------
+% License page: printed after the cover when \license or \customlicense is
+% given, at the bottom of an otherwise empty page
+% ---------------------------------------------------------------------------
+\def\slim@license{}
+\newcommand{\license}[2][4.0]{%
+  \def\slim@license{cc}\def\slim@lic@type{#2}\def\slim@lic@ver{#1}}
+\newcommand{\customlicense}[1]{%
+  \def\slim@license{custom}\def\slim@lic@text{#1}}
+
+\ifdefstring{\slim@lang}{italian}{%
+  \@namedef{slim@ccname@by}{Attribuzione}%
+  \@namedef{slim@ccname@by-sa}{Attribuzione - Condividi allo stesso modo}%
+  \@namedef{slim@ccname@by-nd}{Attribuzione - Non opere derivate}%
+  \@namedef{slim@ccname@by-nc}{Attribuzione - Non commerciale}%
+  \@namedef{slim@ccname@by-nc-sa}{Attribuzione - Non commerciale - Condividi
+    allo stesso modo}%
+  \@namedef{slim@ccname@by-nc-nd}{Attribuzione - Non commerciale - Non opere
+    derivate}%
+  \def\slim@str@international{Internazionale}%
+  \newcommand{\slim@cctext}[2]{% #1 = name and version, #2 = url
+    Quest'opera è distribuita con licenza Creative Commons #1.
+    Per leggere una copia della licenza visita \url{#2}.}%
+  \newcommand{\slim@cczerotext}[1]{%
+    Quest'opera è dedicata al pubblico dominio con la dichiarazione
+    Creative Commons CC0 1.0 Universale. Per leggerne il testo visita
+    \url{#1}.}%
+}{%
+  \@namedef{slim@ccname@by}{Attribution}%
+  \@namedef{slim@ccname@by-sa}{Attribution-ShareAlike}%
+  \@namedef{slim@ccname@by-nd}{Attribution-NoDerivatives}%
+  \@namedef{slim@ccname@by-nc}{Attribution-NonCommercial}%
+  \@namedef{slim@ccname@by-nc-sa}{Attribution-NonCommercial-ShareAlike}%
+  \@namedef{slim@ccname@by-nc-nd}{Attribution-NonCommercial-NoDerivatives}%
+  \def\slim@str@international{International}%
+  \newcommand{\slim@cctext}[2]{%
+    This work is licensed under a Creative Commons #1 License.
+    To view a copy of this license, visit \url{#2}.}%
+  \newcommand{\slim@cczerotext}[1]{%
+    This work is dedicated to the public domain under the Creative Commons
+    CC0 1.0 Universal Public Domain Dedication. To view its text, visit
+    \url{#1}.}%
+}
+
+\newcommand{\slim@licensebutton}[2]{% #1 = button file, #2 = url
+  \href{#2}{\includegraphics[height=1cm]{\slim@licensedir #1}}\par
+  \bigskip}
+
+\newcommand{\slim@cclicense}{%
+  \ifdefstring{\slim@lic@type}{zero}{%
+    \def\slim@lic@url{https://creativecommons.org/publicdomain/zero/1.0/}%
+    \slim@licensebutton{cc-zero}{\slim@lic@url}%
+    \slim@cczerotext{\slim@lic@url}\par
+  }{%
+    \ifcsname slim@ccname@\slim@lic@type\endcsname
+      \edef\slim@lic@url{https://creativecommons.org/licenses/%
+        \slim@lic@type/\slim@lic@ver/}%
+      \slim@licensebutton{cc-\slim@lic@type}{\slim@lic@url}%
+      \textcopyright\ \the\year\ \@author\par
+      \medskip
+      \slim@cctext
+        {\csname slim@ccname@\slim@lic@type\endcsname\ \slim@lic@ver
+         \ifdefstring{\slim@lic@ver}{4.0}{ \slim@str@international}{}}
+        {\slim@lic@url}\par
+    \else
+      \PackageError{slimthesis}{Unknown license `\slim@lic@type'}
+        {Use one of: by, by-sa, by-nd, by-nc, by-nc-sa, by-nc-nd, zero;
+         for other licenses use \protect\customlicense.}%
+    \fi
+  }}
+
+\newcommand{\slim@licensepage}{%
+  \ifx\slim@license\@empty\else
+    \clearpage
+    \thispagestyle{empty}%
+    \null\vfill
+    \begingroup
+    \small\setlength{\parindent}{0pt}%
+    \ifdefstring{\slim@license}{custom}{\slim@lic@text\par}{\slim@cclicense}%
+    \endgroup
+    \clearpage
+  \fi}
+
+% ---------------------------------------------------------------------------
+% Cover
+% ---------------------------------------------------------------------------
+\def\slim@supervisor{}
+\newcommand{\supervisor}[1]{\def\slim@supervisor{#1}}
+\newcounter{slim@cosup}
+\def\slim@cosupervisors{}
+\newcommand{\cosupervisor}[1]{%
+  \stepcounter{slim@cosup}%
+  \appto\slim@cosupervisors{\\#1}}
+\newcommand{\slim@cosuplabel}{%
+  \ifnum\value{slim@cosup}>1 \slim@str@cosupervisors\else\slim@str@cosupervisor\fi:}
+\def\slim@studentid{}
+\newcommand{\studentid}[1]{\def\slim@studentid{#1}}
+\def\slim@year{}
+\newcommand{\academicyear}[1]{\def\slim@year{#1}}
+
+% Cover header text (sizes calibrated on the Informatica logo).
+% Faculty lines share one font size: the default one, reduced if needed so
+% that the longest line fits the text width. The course line wraps if too
+% long (shrunk slightly if just a bit too wide); use \\ in \course{..}
+% to choose where it breaks.
+\newsavebox{\slim@linebox}
+\newdimen\slim@facmax
+\def\slim@facsize{18.3}
+\newcommand{\slim@headerfont}[1][18.3]{\titlefont\fontsize{#1pt}{22pt}\selectfont}
+\newcommand{\slim@measurefaculty}[1]{%
+  \sbox{\slim@linebox}{\slim@headerfont\MakeUppercase{#1}}%
+  \ifdim\wd\slim@linebox>\slim@facmax \global\slim@facmax=\wd\slim@linebox\fi}
+\newcommand{\slim@setfacultysize}{%
+  \global\slim@facmax=0pt
+  \begingroup\let\slim@facultyline\slim@measurefaculty\slim@faculties\endgroup
+  \ifdim\slim@facmax>\textwidth
+    \edef\slim@facsize{\fpeval{18.3*\textwidth/\slim@facmax}}%
+  \else
+    \def\slim@facsize{18.3}%
+  \fi}
+\newcommand{\slim@facultyline}[1]{%
+  {\slim@headerfont[\slim@facsize]\MakeUppercase{#1}}\par}
+\newcommand{\slim@courseline}[1]{%
+  \in@{\\}{#1}%
+  \ifin@\else
+    \sbox{\slim@linebox}{\slim@headerfont\MakeUppercase{#1}}%
+  \fi
+  \ifin@                                     % explicit line break
+    \slim@coursepar{#1}%
+  \else\ifdim\wd\slim@linebox>1.15\textwidth % much too long: wrap
+    \slim@coursepar{#1}%
+  \else\ifdim\wd\slim@linebox>\textwidth     % slightly too long: shrink
+    \resizebox{\textwidth}{!}{\usebox{\slim@linebox}}%
+  \else
+    \usebox{\slim@linebox}%
+  \fi\fi\fi\par}
+\newcommand{\slim@coursepar}[1]{%
+  \parbox[t]{\textwidth}{\centering\slim@headerfont\MakeUppercase{#1}}}
+
+% Cover header: a logo that already carries faculty and course, or the
+% university seal followed by typeset faculty and course lines
+\newcommand{\slim@coverheader}{%
+  \begin{center}
+    \ifslim@logohasheader
+      \includegraphics[width=\textwidth]{\slim@logodir\slim@logo}
+    \else
+      \includegraphics[width=0.78\textwidth]{\slim@logodir\slim@logo}\par
+      \setlength{\baselineskip}{25pt}%
+      \vspace{-2pt}%
+      \slim@setfacultysize
+      \slim@faculties
+      \ifx\slim@course\@empty\else
+        \vspace{\dimexpr 16pt-\prevdepth\relax}\nointerlineskip
+        \noindent\rule{\textwidth}{0.6pt}\par
+        \setlength{\baselineskip}{29pt}%
+        \expandafter\slim@courseline\expandafter{\slim@course}%
+      \fi
+    \fi
+  \end{center}}
+
+\renewcommand{\maketitle}{%
+  \begingroup
+  \clearpage
+  \thispagestyle{empty}%
+  \newgeometry{bottom=2cm, top=2cm}%
+  % --- page 1 ---
+  \slim@coverheader
+  \vspace*{\fill}
+  \begin{center}
+    \titlefont\fontsize{28pt}{48pt}\selectfont\textbf{\@title}
+  \end{center}
+  \vspace*{\fill}
+  \begin{center}
+    \large
+    \begin{minipage}[t]{0.45\textwidth}
+      \raggedright\headingfont\setlength{\baselineskip}{22pt}%
+      \slim@str@supervisor:\\\slim@supervisor
+      \ifnum\value{slim@cosup}>0
+        \bigskip\bigskip\\ \slim@cosuplabel\slim@cosupervisors
+      \fi
+      \bigskip\bigskip
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.45\textwidth}
+      \begin{flushright}
+        \headingfont\setlength{\baselineskip}{22pt}%
+        \slim@str@workby\\\@author
+        \ifx\slim@studentid\@empty\else
+          \\\slim@str@studentid: \slim@studentid
+        \fi
+      \end{flushright}
+    \end{minipage}
+  \end{center}
+  \bigskip
+  \begin{center}{\headingfont\large\slim@str@year\ \slim@year}\end{center}
+  \clearpage
+  \restoregeometry
+  \slim@licensepage
+  \endgroup}
+
+% ---------------------------------------------------------------------------
+% Closing page: "Made in SLIM" with logo and web site at the bottom
+% ---------------------------------------------------------------------------
+\newcommand{\madeinslimpage}{%
+  \clearpage
+  \if@twoside % on a left-hand page, i.e. the back cover
+    \ifodd\c@page \hbox{}\thispagestyle{empty}\newpage\fi
+  \fi
+  \thispagestyle{empty}%
+  \null\vfill
+  \begin{center}
+    \includegraphics[width=2.5cm]{\slim@logodir slim-logo}\par
+    \vspace{0.5cm}%
+    {\headingfont\large Made in SLIM\par}%
+    \vspace{0.15cm}%
+    {\headingfont\small\color{DimGray}%
+     \href{https://slim.di.unimi.it}{slim.di.unimi.it}\par}%
+  \end{center}
+  \clearpage}
+\ifslim@madeinslim
+  \AtEndDocument{\madeinslimpage}
+\fi
+
+\endinput

@@ -1,0 +1,53 @@
+\chapter{Appendices} \label{app:appendices}
+
+Material that supports the thesis but would interrupt its flow, such as
+long proofs, additional experimental results, the full description of a
+dataset or a user manual, belongs in one or more appendices, placed after
+the conclusions and before the bibliography.
+
+\section{Writing an appendix}
+
+The command \cs{appendix} in \texttt{main.tex} marks the beginning of the
+appendices; each of them is then an ordinary chapter, in its own file:
+\begin{Verbatim}
+\include{chapters/conclusions}
+
+\appendix
+\include{chapters/appendix}
+
+\printthesisbibliography
+\end{Verbatim}
+After \cs{appendix}, chapters are labelled ``Appendix'' (``Appendice'' in
+Italian) instead of ``Chapter'', both in their heading and in the running
+header, and are numbered with capital letters: this appendix is
+Appendix~\ref{app:appendices}, its first section is
+Section~\ref{app:appendices}.1, and its figures, tables, theorems and
+algorithms are numbered accordingly, as for Table~\ref{tab:search-space}.
+Cross-references work as in the rest of the thesis.
+
+\section{An example of supporting material}
+
+Table~\ref{tab:search-space} lists the values of the hyperparameters
+explored by the grid search of Table~\ref{tab:grid}: a typical detail that
+is needed to reproduce the experiments, but not to follow the main
+discussion.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Search space of the grid search]{Values of the hyperparameters
+    explored by the grid search of Table~\ref{tab:grid}.}
+  \label{tab:search-space}
+  \begin{tabular}{ll}
+    \toprule
+    Hyperparameter & Values \\
+    \midrule
+    Maximum depth of the trees      & 4, 8, 16, 32, \texttt{None} (unbounded) \\
+    Number of trees                 & 50, 100, 200, 500 \\
+    Features considered at a split  & \texttt{sqrt}, \texttt{log2}, 0.5 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+An appendix should be referred to from the main text, at the point where
+its content is relevant; material that is never referred to probably does
+not belong in the thesis.

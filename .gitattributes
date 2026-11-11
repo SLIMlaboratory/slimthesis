@@ -1,0 +1,4 @@
+# files not included in the zip archive used to open the template on Overleaf
+.github         export-ignore
+.gitignore      export-ignore
+.gitattributes  export-ignore

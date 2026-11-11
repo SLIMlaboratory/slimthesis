@@ -1,0 +1,655 @@
+\chapter{Writing the thesis} \label{ch2}
+
+This chapter shows how the style renders the elements of a scientific text:
+headings, cross-references, mathematics, theorems, tables and figures. Each
+example is followed by its source code, which can be copied into the thesis.
+
+\section{Headings and cross-references} \label{sec:headings}
+
+The thesis is divided into chapters, sections and subsections:
+\begin{Verbatim}
+\chapter{Writing the thesis}  \label{ch2}
+\section{Headings}            \label{sec:headings}
+\subsection{Labels}
+\end{Verbatim}
+Subsubsections (\cs{subsubsection}) are available too, but they are neither
+numbered nor listed in the table of contents: if you feel the need for
+them, the section is probably too long.
+
+Every numbered element can be given a \cs{label} and referred to with
+\cs{ref} (or \cs{eqref} for equations). A non-breaking space (\verb|~|)
+avoids a line break between the word and the number:
+\begin{Verbatim}
+as discussed in Section~\ref{sec:headings}
+\end{Verbatim}
+which produces ``as discussed in Section~\ref{sec:headings}''. References
+are hyperlinks (Section~\ref{sec:links}).
+
+\section{Mathematics} \label{sec:math}
+
+Mathematics is typeset with the STIX Two Math font (see the \texttt{mathfont}
+option in Section~\ref{sec:programme}). Inline formulas are
+enclosed in dollar signs: \verb|$\bx_i \in \R^d$| produces
+$\bx_i \in \R^d$. Displayed formulas that need a number use the
+\texttt{equation} environment:
+\begin{equation} \label{eq:risk}
+  \min_{\bw, b} \; \frac{1}{n} \sum_{i=1}^n
+    \ell\bigl(y_i, \bw^\top \bx_i + b\bigr) + \lambda \lVert \bw \rVert^2
+\end{equation}
+\begin{Verbatim}
+\begin{equation} \label{eq:risk}
+  \min_{\bw, b} \; \frac{1}{n} \sum_{i=1}^n
+    \ell\bigl(y_i, \bw^\top \bx_i + b\bigr) + \lambda \lVert \bw \rVert^2
+\end{equation}
+\end{Verbatim}
+and can be referred to as \verb|\eqref{eq:risk}|, which gives
+\eqref{eq:risk}.
+
+A displayed formula that is never referred to does not need a number:
+enclose it between \verb|\[| and \verb|\]|, which centre it on a line of
+its own exactly as \texttt{equation} does, but without number. For
+instance, the logistic function
+\[
+  \sigma(z) = \frac{1}{1 + e^{-z}}
+\]
+is typeset by
+\begin{Verbatim}
+\[
+  \sigma(z) = \frac{1}{1 + e^{-z}}
+\]
+\end{Verbatim}
+The environment \texttt{equation*} is equivalent to \verb|\[|\dots\verb|\]|.
+Number only the formulas you actually refer to: a thesis in which every
+formula is numbered is harder to read, not easier.
+
+Several formulas aligned on a common symbol use \texttt{align}:
+\begin{align}
+  \pr  &= \frac{\TP}{\TP + \FP}, &
+  \rec &= \frac{\TP}{\TP + \FN}, \label{eq:prec-rec} \\
+  \F_1 &= 2 \, \frac{\pr \cdot \rec}{\pr + \rec}. \label{eq:f1}
+\end{align}
+\begin{Verbatim}
+\begin{align}
+  \pr  &= \frac{\TP}{\TP + \FP}, &
+  \rec &= \frac{\TP}{\TP + \FN}, \label{eq:prec-rec} \\
+  \F_1 &= 2 \, \frac{\pr \cdot \rec}{\pr + \rec}. \label{eq:f1}
+\end{align}
+\end{Verbatim}
+Its starred version \texttt{align*} aligns the formulas without numbering
+any of them, while \cs{notag} at the end of a line of \texttt{align} omits
+the number of that line only:
+\begin{align*}
+  \sigma(z)  &= \frac{1}{1 + e^{-z}}, \\
+  \sigma'(z) &= \sigma(z) \bigl(1 - \sigma(z)\bigr).
+\end{align*}
+\begin{Verbatim}
+\begin{align*}
+  \sigma(z)  &= \frac{1}{1 + e^{-z}}, \\
+  \sigma'(z) &= \sigma(z) \bigl(1 - \sigma(z)\bigr).
+\end{align*}
+\end{Verbatim}
+
+\subsection{Notation}
+
+Notation used throughout the thesis is best defined once, as macros in
+\nolinkurl{style/symbols.tex}. The file already contains, among others, bold
+vectors and matrices (\verb|\bx|, \verb|\bw|, \verb|\bX| give $\bx$, $\bw$,
+$\bX$), number sets (\verb|\R| gives $\R$) and the operators used above
+(\verb|\pr|, \verb|\rec|, \verb|\sgn|). Edit it freely: it belongs to your
+thesis, not to the style. Note also that \cs{epsilon} is redefined as
+\cs{varepsilon}, so it is printed as $\epsilon$. The meaning of the
+notation can be summarised in the list of symbols
+(Section~\ref{sec:symbols}).
+
+\subsection{Theorems and definitions} \label{sec:theorems}
+
+The style defines the theorem-like environments listed in
+Table~\ref{tab:theorems}. Each numbered environment has its own counter,
+which restarts at each chapter: they are numbered as chapter and
+progressive number, so that the first definition and the first
+proposition of Chapter~2 are Definition~2.1 and Proposition~2.1, the
+second definition is Definition~2.2, and so on.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Theorem-like environments]{Theorem-like environments and their
+    headings in the two languages.}
+  \label{tab:theorems}
+  \begin{tabular}{lll}
+    \toprule
+    Environment & English & Italian \\
+    \midrule
+    \texttt{thm}       & Theorem      & Teorema \\
+    \texttt{lem}       & Lemma        & Lemma \\
+    \texttt{prop}      & Proposition  & Proposizione \\
+    \texttt{cor}       & Corollary    & Corollario \\
+    \texttt{defn}, \texttt{defn*} & Definition & Definizione \\
+    \texttt{fact}      & Fact         & Fatto \\
+    \texttt{proof}     & Proof        & Dimostrazione \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{defn} \label{def:convex}
+  A function $f \colon \R^d \to \R$ is \emph{convex} if
+  $f(\alpha \bx + (1 - \alpha) \by) \le \alpha f(\bx) + (1 - \alpha) f(\by)$
+  for all $\bx, \by \in \R^d$ and $\alpha \in [0, 1]$.
+\end{defn}
+
+\begin{prop} \label{prop:hinge}
+  For every $y \in \{-1, +1\}$, the hinge loss $\ell(y, z) = \max\{0, 1 - yz\}$
+  is a convex function of $z$.
+\end{prop}
+
+\begin{proof}
+  It is the maximum of two affine functions of $z$, and the maximum of convex
+  functions is convex.
+\end{proof}
+
+\begin{Verbatim}
+\begin{defn} \label{def:convex}
+  A function $f \colon \R^d \to \R$ is \emph{convex} if ...
+\end{defn}
+
+\begin{prop} \label{prop:hinge}
+  For every $y \in \{-1, +1\}$, the hinge loss ... is convex.
+\end{prop}
+
+\begin{proof}
+  It is the maximum of two affine functions of $z$, ...
+\end{proof}
+\end{Verbatim}
+
+\paragraph{Unnumbered definitions} Definitions that are never referred to,
+for instance when recalling a standard notion, can use \texttt{defn*}: it
+has the same heading as \texttt{defn}, but no number, and does not advance
+the counter of definitions. Since there is no number, it cannot be the target of a
+\cs{ref}.
+
+\begin{defn*}
+  The \emph{Euclidean norm} of $\bx \in \R^d$ is
+  $\lVert \bx \rVert = \sqrt{x_1^2 + \dots + x_d^2}$.
+\end{defn*}
+
+\begin{Verbatim}
+\begin{defn*}
+  The \emph{Euclidean norm} of $\bx \in \R^d$ is
+  $\lVert \bx \rVert = \sqrt{x_1^2 + \dots + x_d^2}$.
+\end{defn*}
+\end{Verbatim}
+Unnumbered versions of the other environments can be added in the preamble
+with the \cs{newtheorem*} command of the \texttt{amsthm} package; their
+heading, however, does not change with the language of the programme:
+\begin{Verbatim}
+\newtheorem*{thm*}{Theorem}
+\end{Verbatim}
+
+\section{Tables} \label{sec:tables}
+
+Tables are placed in a floating \texttt{table} environment, with the
+caption \emph{above} the table. Use the rules of the \texttt{booktabs}
+package (\cs{toprule}, \cs{midrule}, \cs{bottomrule}) and no vertical lines.
+For numbers, the \texttt{S} column of \texttt{siunitx} aligns values on the
+decimal point and formats uncertainties, as in Table~\ref{tab:results}.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Performance of the compared models]{Performance of the compared
+    models on the test set (mean $\pm$ standard deviation over 10 runs). Best
+    values in bold.}
+  \label{tab:results}
+  \begin{tabular}{l
+                  S[table-format=1.3(2), detect-weight, mode=text]
+                  S[table-format=1.3(2), detect-weight, mode=text]
+                  S[table-format=1.3(2), detect-weight, mode=text]}
+    \toprule
+    {Model} & {Precision} & {Recall} & {$\F_1$} \\
+    \midrule
+    Logistic regression & 0.812(14) & 0.774(21) & 0.792(12) \\
+    SVM (linear)        & 0.828(11) & 0.781(18) & 0.803(10) \\
+    SVM (RBF)           & 0.851(09) & 0.802(15) & 0.825(08) \\
+    Random forest       & \bfseries 0.869(10) & \bfseries 0.815(13) & \bfseries 0.841(07) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{Verbatim}
+\begin{table}[htbp]
+  \centering
+  \caption{Performance of the compared models ...}
+  \label{tab:results}
+  \begin{tabular}{l
+                  S[table-format=1.3(2), detect-weight, mode=text]
+                  ...}
+    \toprule
+    {Model} & {Precision} & {Recall} & {$\F_1$} \\
+    \midrule
+    Logistic regression & 0.812(14) & 0.774(21) & 0.792(12) \\
+    ...
+    Random forest       & \bfseries 0.869(10) & ... \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{Verbatim}
+Headers in \texttt{S} columns go between braces; the options
+\texttt{detect-weight} and \texttt{mode=text} are needed to typeset a value
+in bold with \cs{bfseries}.
+
+\subsection{Rotated tables} \label{sec:rotated}
+
+A table too wide for the page can be placed on a page in landscape
+orientation, so that its width runs along the height of the sheet. The
+\texttt{landscape} environment of the \texttt{pdflscape} package, loaded in
+\texttt{main.tex}, typesets its content on rotated pages; in the PDF these
+pages are also marked as landscape, so that viewers display them the right
+way up. Wrapping it in \cs{afterpage} defers the landscape page until the
+end of the current one, so that the text flows without leaving a gap, as for
+Table~\ref{tab:datasets}.
+
+\afterpage{%
+\begin{landscape}
+\begin{table}
+  \centering
+  \caption[Performance on three datasets]{Precision, recall and $\F_1$ score
+    of the compared models on three datasets (mean over 10 runs). Best values
+    for each dataset in bold.}
+  \label{tab:datasets}
+  \sisetup{table-format=1.3, detect-weight, mode=text}
+  \begin{tabular}{l SSS SSS SSS}
+    \toprule
+    & \multicolumn{3}{c}{Breast cancer}
+    & \multicolumn{3}{c}{Credit default}
+    & \multicolumn{3}{c}{Hospital readmission} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+    {Model} & {Precision} & {Recall} & {$\F_1$}
+            & {Precision} & {Recall} & {$\F_1$}
+            & {Precision} & {Recall} & {$\F_1$} \\
+    \midrule
+    Logistic regression & 0.951 & 0.962 & 0.956
+                        & 0.692 & 0.358 & 0.472
+                        & 0.618 & 0.540 & 0.576 \\
+    SVM (linear)        & 0.958 & 0.965 & 0.961
+                        & 0.701 & 0.341 & 0.459
+                        & 0.622 & 0.533 & 0.574 \\
+    SVM (RBF)           & \bfseries 0.972 & 0.969 & \bfseries 0.970
+                        & 0.688 & 0.372 & 0.483
+                        & 0.635 & 0.548 & 0.588 \\
+    Random forest       & 0.965 & \bfseries 0.971 & 0.968
+                        & \bfseries 0.712 & \bfseries 0.389 & \bfseries 0.503
+                        & \bfseries 0.651 & \bfseries 0.566 & \bfseries 0.606 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{landscape}}
+
+\begin{Verbatim}
+\afterpage{%
+\begin{landscape}
+\begin{table}
+  \centering
+  \caption{Precision, recall and $\F_1$ score of the compared models ...}
+  \label{tab:datasets}
+  \sisetup{table-format=1.3, detect-weight, mode=text}
+  \begin{tabular}{l SSS SSS SSS}
+    \toprule
+    & \multicolumn{3}{c}{Breast cancer}
+    & \multicolumn{3}{c}{Credit default}
+    & \multicolumn{3}{c}{Hospital readmission} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+    {Model} & {Precision} & {Recall} & {$\F_1$} & ... \\
+    \midrule
+    Logistic regression & 0.951 & 0.962 & 0.956 & ... \\
+    ...
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{landscape}}
+\end{Verbatim}
+Here \cs{sisetup} sets the options of all the \texttt{S} columns at once,
+\cs{multicolumn} spans a header over several columns and \cs{cmidrule} draws a
+partial rule below it. Wide figures are placed on landscape pages in the
+same way, with a \texttt{figure} environment inside \texttt{landscape}.
+
+\subsection{Tables spanning several pages} \label{sec:longtable}
+
+A table longer than a page is written with the \texttt{longtable}
+environment of the package with the same name, loaded in
+\texttt{main.tex}. Unlike \texttt{table}, it does not float: it starts where
+it is written and continues on as many pages as needed. Its first rows
+declare what is repeated on each page: the header of the first page (ended
+by \cs{endfirsthead}), the header of the following pages (\cs{endhead}),
+the footer of all pages but the last (\cs{endfoot}) and the footer of the
+last page (\cs{endlastfoot}). Table~\ref{tab:grid} shows the result, and its
+source follows; the values explored by the search are listed in
+Table~\ref{tab:search-space}, in Appendix~\ref{app:appendices}.
+
+\begin{longtable}{r r r l S[table-format=1.3, detect-weight, mode=text]}
+  \caption[Grid search of a random forest]{$\F_1$ score of a random forest
+    for each configuration of a grid search over its hyperparameters
+    (illustrative values). Best value in bold.}
+  \label{tab:grid} \\
+  \toprule
+  {\#} & {Max depth} & {Trees} & {Max features} & {$\F_1$} \\
+  \midrule
+  \endfirsthead
+  \caption[]{(continued)} \\
+  \toprule
+  {\#} & {Max depth} & {Trees} & {Max features} & {$\F_1$} \\
+  \midrule
+  \endhead
+  \midrule
+  \multicolumn{5}{r}{\emph{Continued on next page}} \\
+  \endfoot
+  \bottomrule
+  \endlastfoot
+    1 & 4 & 50 & \texttt{sqrt} & 0.775 \\
+    2 & 4 & 50 & \texttt{log2} & 0.769 \\
+    3 & 4 & 50 & 0.5 & 0.772 \\
+    4 & 4 & 100 & \texttt{sqrt} & 0.777 \\
+    5 & 4 & 100 & \texttt{log2} & 0.771 \\
+    6 & 4 & 100 & 0.5 & 0.780 \\
+    7 & 4 & 200 & \texttt{sqrt} & 0.783 \\
+    8 & 4 & 200 & \texttt{log2} & 0.777 \\
+    9 & 4 & 200 & 0.5 & 0.779 \\
+    10 & 4 & 500 & \texttt{sqrt} & 0.787 \\
+    11 & 4 & 500 & \texttt{log2} & 0.781 \\
+    12 & 4 & 500 & 0.5 & 0.784 \\
+    13 & 8 & 50 & \texttt{sqrt} & 0.800 \\
+    14 & 8 & 50 & \texttt{log2} & 0.794 \\
+    15 & 8 & 50 & 0.5 & 0.797 \\
+    16 & 8 & 100 & \texttt{sqrt} & 0.802 \\
+    17 & 8 & 100 & \texttt{log2} & 0.796 \\
+    18 & 8 & 100 & 0.5 & 0.805 \\
+    19 & 8 & 200 & \texttt{sqrt} & 0.808 \\
+    20 & 8 & 200 & \texttt{log2} & 0.802 \\
+    21 & 8 & 200 & 0.5 & 0.804 \\
+    22 & 8 & 500 & \texttt{sqrt} & 0.812 \\
+    23 & 8 & 500 & \texttt{log2} & 0.806 \\
+    24 & 8 & 500 & 0.5 & 0.809 \\
+    25 & 16 & 50 & \texttt{sqrt} & 0.809 \\
+    26 & 16 & 50 & \texttt{log2} & 0.803 \\
+    27 & 16 & 50 & 0.5 & 0.812 \\
+    28 & 16 & 100 & \texttt{sqrt} & 0.817 \\
+    29 & 16 & 100 & \texttt{log2} & 0.811 \\
+    30 & 16 & 100 & 0.5 & 0.813 \\
+    31 & 16 & 200 & \texttt{sqrt} & 0.816 \\
+    32 & 16 & 200 & \texttt{log2} & 0.810 \\
+    33 & 16 & 200 & 0.5 & 0.819 \\
+    34 & 16 & 500 & \texttt{sqrt} & 0.821 \\
+    35 & 16 & 500 & \texttt{log2} & 0.815 \\
+    36 & 16 & 500 & 0.5 & \bfseries 0.824 \\
+    37 & 32 & 50 & \texttt{sqrt} & 0.807 \\
+    38 & 32 & 50 & \texttt{log2} & 0.801 \\
+    39 & 32 & 50 & 0.5 & 0.810 \\
+    40 & 32 & 100 & \texttt{sqrt} & 0.815 \\
+    41 & 32 & 100 & \texttt{log2} & 0.809 \\
+    42 & 32 & 100 & 0.5 & 0.811 \\
+    43 & 32 & 200 & \texttt{sqrt} & 0.814 \\
+    44 & 32 & 200 & \texttt{log2} & 0.808 \\
+    45 & 32 & 200 & 0.5 & 0.817 \\
+    46 & 32 & 500 & \texttt{sqrt} & 0.819 \\
+    47 & 32 & 500 & \texttt{log2} & 0.813 \\
+    48 & 32 & 500 & 0.5 & 0.822 \\
+    49 & \texttt{None} & 50 & \texttt{sqrt} & 0.807 \\
+    50 & \texttt{None} & 50 & \texttt{log2} & 0.801 \\
+    51 & \texttt{None} & 50 & 0.5 & 0.804 \\
+    52 & \texttt{None} & 100 & \texttt{sqrt} & 0.809 \\
+    53 & \texttt{None} & 100 & \texttt{log2} & 0.803 \\
+    54 & \texttt{None} & 100 & 0.5 & 0.806 \\
+    55 & \texttt{None} & 200 & \texttt{sqrt} & 0.815 \\
+    56 & \texttt{None} & 200 & \texttt{log2} & 0.809 \\
+    57 & \texttt{None} & 200 & 0.5 & 0.811 \\
+    58 & \texttt{None} & 500 & \texttt{sqrt} & 0.819 \\
+    59 & \texttt{None} & 500 & \texttt{log2} & 0.813 \\
+    60 & \texttt{None} & 500 & 0.5 & 0.816 \\
+\end{longtable}
+
+\begin{Verbatim}
+\begin{longtable}{r r r l S[table-format=1.3, detect-weight, mode=text]}
+  \caption{$\F_1$ score of a random forest for each configuration ...}
+  \label{tab:grid} \\
+  \toprule
+  {\#} & {Max depth} & {Trees} & {Max features} & {$\F_1$} \\
+  \midrule
+  \endfirsthead
+  \caption[]{(continued)} \\
+  \toprule
+  {\#} & {Max depth} & {Trees} & {Max features} & {$\F_1$} \\
+  \midrule
+  \endhead
+  \midrule
+  \multicolumn{5}{r}{\emph{Continued on next page}} \\
+  \endfoot
+  \bottomrule
+  \endlastfoot
+  1 & 4 & 50 & \texttt{sqrt} & 0.775 \\
+  2 & 4 & 50 & \texttt{log2} & 0.769 \\
+  ...
+\end{longtable}
+\end{Verbatim}
+The caption and the label are the first row of the table, ended by
+\verb|\\|. On the following pages, \verb|\caption[]{(continued)}| repeats
+the table number followed by ``(continued)'', without adding a second entry
+to the list of tables. Since a long table cannot float, introduce it at the
+point of the text where it belongs, and keep it out of paragraphs: leave an
+empty line before and after it.
+
+\section{Figures} \label{sec:figures}
+
+Figures are placed in a floating \texttt{figure} environment, with the
+caption \emph{below} the figure. Images are included with
+\cs{includegraphics}, looking for them in the \texttt{images/} directory;
+vector formats (PDF) are preferable to bitmaps:
+\begin{Verbatim}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{kde_plot.pdf}
+  \caption{Kernel density estimate of ...}
+  \label{fig:kde}
+\end{figure}
+\end{Verbatim}
+
+Plots can also be drawn directly in \LaTeX{} with \texttt{pgfplots}, so
+that their fonts match the text, as in Figure~\ref{fig:learning-curve}.
+The colours defined in \nolinkurl{style/colors.tex}, as well as
+\texttt{slimblue}, can be used in plots and diagrams.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=0.8\textwidth, height=0.5\textwidth,
+        xlabel={Training set size}, ylabel={$\F_1$},
+        xmin=0, xmax=10000, ymin=0.5, ymax=0.9,
+        scaled x ticks=false,
+        xticklabel style={/pgf/number format/1000 sep={\,}},
+        grid=major, grid style={gray!20},
+        legend pos=south east, legend cell align=left,
+        every axis plot/.append style={thick, mark size=1.5pt},
+      ]
+      \addplot[color=pastelBlueDark, mark=*]
+        coordinates {(500,0.58) (1000,0.65) (2000,0.72) (4000,0.77)
+                     (6000,0.79) (8000,0.80) (10000,0.80)};
+      \addlegendentry{Logistic regression}
+      \addplot[color=attnOrangeDark, mark=square*]
+        coordinates {(500,0.55) (1000,0.63) (2000,0.73) (4000,0.80)
+                     (6000,0.82) (8000,0.83) (10000,0.84)};
+      \addlegendentry{Random forest}
+    \end{axis}
+  \end{tikzpicture}
+  \caption[Learning curves]{Learning curves: $\F_1$ score on the test set as
+    a function of the training set size.}
+  \label{fig:learning-curve}
+\end{figure}
+
+\begin{Verbatim}
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[width=0.8\textwidth, height=0.5\textwidth,
+                 xlabel={Training set size}, ylabel={$\F_1$}, ...]
+      \addplot[color=pastelBlueDark, mark=*]
+        coordinates {(500,0.58) (1000,0.65) ... (10000,0.80)};
+      \addlegendentry{Logistic regression}
+      ...
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Learning curves: ...}
+  \label{fig:learning-curve}
+\end{figure}
+\end{Verbatim}
+
+\subsection{Subfigures} \label{sec:subfigures}
+
+Related images can be grouped in a single figure, each with its own
+caption, using the \texttt{subfigure} environment of the
+\texttt{subcaption} package. Each subfigure is given a width, here slightly
+less than half of the line so that two of them fit side by side, and
+everything inside it, including plots, should be sized relative to
+\cs{linewidth}. Subfigures are labelled (a), (b), and so on: a reference to
+a subfigure, such as \verb|\ref{fig:sigmoid}|, gives
+\ref{fig:sigmoid}, while \verb|\subref{fig:sigmoid}| gives just the label,
+\subref{fig:sigmoid}, as in Figure~\ref{fig:subfigures}.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          width=0.95\linewidth, height=0.8\linewidth,
+          xlabel={$z$}, ylabel={$\sigma(z)$},
+          xmin=-6, xmax=6, ymin=0, ymax=1,
+          grid=major, grid style={gray!20},
+        ]
+        \addplot[color=pastelBlueDark, thick, domain=-6:6, samples=100]
+          {1/(1+exp(-x))};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Logistic function.}
+    \label{fig:sigmoid}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          width=0.95\linewidth, height=0.8\linewidth,
+          xlabel={False positive rate}, ylabel={True positive rate},
+          xmin=0, xmax=1, ymin=0, ymax=1,
+          grid=major, grid style={gray!20},
+        ]
+        \addplot[color=gray, dashed, domain=0:1] {x};
+        \addplot[color=attnOrangeDark, thick, mark=*, mark size=1.2pt]
+          coordinates {(0,0) (0.02,0.35) (0.05,0.58) (0.10,0.74) (0.20,0.87)
+                       (0.35,0.94) (0.60,0.98) (1,1)};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{ROC curve of the random forest.}
+    \label{fig:roc}
+  \end{subfigure}
+  \caption[Logistic function and ROC curve]{Two subfigures:
+    \subref{fig:sigmoid} the logistic function and \subref{fig:roc} a ROC
+    curve, with the diagonal of a random classifier shown dashed.}
+  \label{fig:subfigures}
+\end{figure}
+
+\begin{Verbatim}
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[width=0.95\linewidth, height=0.8\linewidth, ...]
+        \addplot[color=pastelBlueDark, thick, domain=-6:6]
+          {1/(1+exp(-x))};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Logistic function.}
+    \label{fig:sigmoid}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    ...
+    \caption{ROC curve of the random forest.}
+    \label{fig:roc}
+  \end{subfigure}
+  \caption{Two subfigures: \subref{fig:sigmoid} the logistic function
+    and \subref{fig:roc} a ROC curve, ...}
+  \label{fig:subfigures}
+\end{figure}
+\end{Verbatim}
+The optional argument \texttt{[b]} aligns the subfigures at their bottom,
+so that their captions are on the same line even if the images have
+different heights. Images are included in the same way, with
+\verb|\includegraphics[width=\linewidth]{...}| inside each subfigure.
+
+\section{Algorithms} \label{sec:algorithms}
+
+Algorithms are written in pseudocode with the \texttt{algpseudocode}
+package, inside the floating \texttt{algorithm} environment of the
+\texttt{algorithm} package, both loaded in \texttt{main.tex}. Like figures
+and tables, algorithms have a caption and are numbered within each
+chapter, as Algorithm~\ref{alg:kmeans}.
+
+\begin{algorithm}[htbp]
+  \caption{$k$-means clustering}
+  \label{alg:kmeans}
+  \begin{algorithmic}[1]
+    \Require points $\bx_1, \dots, \bx_n \in \R^d$, number of clusters $k$
+    \Ensure centroids $\symbfit{\mu}_1, \dots, \symbfit{\mu}_k$ and
+      assignments $c_1, \dots, c_n$
+    \State choose $\symbfit{\mu}_1, \dots, \symbfit{\mu}_k$ at random among
+      the points
+    \Repeat
+      \For{$i = 1, \dots, n$}
+        \State $c_i \gets \operatorname*{arg\,min}_j
+          \lVert \bx_i - \symbfit{\mu}_j \rVert$
+          \Comment{nearest centroid}
+      \EndFor
+      \For{$j = 1, \dots, k$}
+        \State $\symbfit{\mu}_j \gets$ mean of the points $\bx_i$ with
+          $c_i = j$ \label{alg:kmeans:update}
+      \EndFor
+    \Until{no assignment $c_i$ changes}
+    \State \Return $\symbfit{\mu}_1, \dots, \symbfit{\mu}_k$,
+      $c_1, \dots, c_n$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{Verbatim}
+\begin{algorithm}[htbp]
+  \caption{$k$-means clustering}
+  \label{alg:kmeans}
+  \begin{algorithmic}[1]
+    \Require points $\bx_1, \dots, \bx_n \in \R^d$, number of clusters $k$
+    \Ensure centroids ... and assignments $c_1, \dots, c_n$
+    \State choose $\symbfit{\mu}_1, \dots, \symbfit{\mu}_k$ at random ...
+    \Repeat
+      \For{$i = 1, \dots, n$}
+        \State $c_i \gets \operatorname*{arg\,min}_j
+          \lVert \bx_i - \symbfit{\mu}_j \rVert$
+          \Comment{nearest centroid}
+      \EndFor
+      \For{$j = 1, \dots, k$}
+        \State $\symbfit{\mu}_j \gets$ mean of the points ...
+          \label{alg:kmeans:update}
+      \EndFor
+    \Until{no assignment $c_i$ changes}
+    \State \Return $\symbfit{\mu}_1, \dots, \symbfit{\mu}_k$,
+      $c_1, \dots, c_n$
+  \end{algorithmic}
+\end{algorithm}
+\end{Verbatim}
+The optional argument \texttt{[1]} of \texttt{algorithmic} numbers every
+line; a line can then be given a \cs{label} and referred to, as
+line~\ref{alg:kmeans:update} of Algorithm~\ref{alg:kmeans}, which updates
+the centroids. \cs{Require} and \cs{Ensure} introduce the input and the
+output (printed as ``Input:'' and ``Output:''), \cs{State} a generic
+step, \cs{Comment} a comment aligned to the right; besides \cs{For} and \cs{Repeat}--\cs{Until}, the package provides
+\cs{If}--\cs{ElsIf}--\cs{Else}--\cs{EndIf}, \cs{While}--\cs{EndWhile},
+\cs{Function}--\cs{EndFunction} and \cs{Call}. The heading is
+``Algorithm'' or ``Algoritmo'' according to the language. Algorithms are
+collected in
+the list of algorithms, printed by \cs{listofalgorithms} after the list of
+tables (Section~\ref{sec:structure}).

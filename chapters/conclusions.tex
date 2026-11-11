@@ -1,0 +1,34 @@
+\chapter{Before submitting} \label{ch:conclusions}
+
+A few checks are worth doing before the final submission.
+
+\begin{itemize}
+  \item The cover shows the right programme, the full names of supervisor
+    and co-supervisors, the academic year and, if required, the student ID.
+  \item The compilation completes without errors, and the log contains no
+    \emph{undefined references} or \emph{undefined citations}: run the full
+    sequence of Chapter~\ref{ch1} (or \texttt{latexmk}) once more after the
+    last change.
+  \item The log reports no \emph{overfull boxes}, i.e., no lines exceeding
+    the margin; long words or formulas causing them can be fixed by
+    rephrasing, or by suggesting hyphenation points with \verb|\-|.
+  \item Every figure and table is referred to in the text, and its caption
+    can be understood without reading the surrounding text.
+  \item Bibliographic entries are complete (authors, title, venue, year) and
+    have a DOI whenever one exists.
+  \item Placeholder material, such as the examples of this document, the
+    dedication or the epigraph if not wanted, has been removed.
+\end{itemize}
+
+\section*{Customising the style}
+
+The style is meant to be used as it is, but a few aspects are easy to
+change in \texttt{slimthesis.sty}, where they are grouped and commented:
+the spacing of the bibliography (\cs{bibitemsep} and the line spacing set by
+\cs{AtBeginBibliography}), the colour of links (\texttt{slimblue}), and the
+fonts. Keep such changes to a minimum, and note them down: when a new
+version of the style is released, they will have to be applied again.
+
+The last page of the thesis acknowledges the SLIM laboratory; it can be
+omitted with the \texttt{madeinslim=false} option described in
+Section~\ref{sec:programme}.
