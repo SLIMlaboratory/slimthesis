@@ -142,9 +142,9 @@ document and all the fixed labels:
 
 | Value            | Degree     | Programme                             | Language |
 |------------------|------------|---------------------------------------|----------|
-| `inf` (default)  | Bachelor's | Informatica                           | Italian  |
+| `inf`            | Bachelor's | Informatica                           | Italian  |
 | `inf-lm`         | Master's   | Informatica                           | Italian  |
-| `cs`             | Master's   | Computer Science                      | English  |
+| `cs` (default)   | Master's   | Computer Science                      | English  |
 | `dse`            | Master's   | Data Science for Economics            | English  |
 | `dseh`           | Master's   | Data Science for Economics and Health | English  |
 
@@ -915,8 +915,8 @@ omitted with the `madeinslim=false` option.
 
 ## License
 
-Copyright (c) 2026 Dario Malchiodi and SLIM laboratory, Università degli
-Studi di Milano.
+Copyright (c) 2026 Ivan Mazzon, Dario Malchiodi and SLIM laboratory,
+Università degli Studi di Milano.
 
 The template is released under the [MIT license](LICENSE). The license
 covers the template only: theses written with it belong to their authors.

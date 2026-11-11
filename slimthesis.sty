@@ -2,7 +2,7 @@
 %% Thesis style: Libertinus + Figtree typography, custom chapter heads,
 %% fancy headers, theorem environments, cover page.
 %%
-%% Copyright (c) 2026 Dario Malchiodi and SLIM laboratory,
+%% Copyright (c) 2026 Ivan Mazzon, Dario Malchiodi and SLIM laboratory,
 %% Università degli Studi di Milano
 %% SPDX-License-Identifier: MIT (see the file LICENSE)
 %%
@@ -11,9 +11,9 @@
 %%
 %% Package options (key=value):
 %%   programme=<id>  degree programme; sets cover, language and labels:
-%%       inf     Laurea in Informatica                          (default, Italian)
+%%       inf     Laurea in Informatica                          (Italian)
 %%       inf-lm  Laurea Magistrale in Informatica               (Italian)
-%%       cs      Master's Degree in Computer Science            (English)
+%%       cs      Master's Degree in Computer Science            (default, English)
 %%       dse     Master's Degree in Data Science for Economics  (English)
 %%       dseh    Master's Degree in Data Science for Economics
 %%               and Health                                     (English)
@@ -50,7 +50,7 @@
 % ---------------------------------------------------------------------------
 % Options
 % ---------------------------------------------------------------------------
-\def\slim@programme{inf}
+\def\slim@programme{cs}
 \def\slim@fontdir{fonts/Figtree/}
 \def\slim@logodir{images/coverPage/}
 \def\slim@licensedir{images/license/}
@@ -283,7 +283,7 @@
     {\bfseries\Huge\headingfont}
     {%
         \rlap{%
-            \parbox{\textwidth-0.28cm}{%
+            \parbox{\textwidth}{%
                 \vspace{-1.7ex}
                 {\color{Gainsboro}\LARGE
                  \MakeUppercase{\IfAppendix{\appendixname}{\chaptername}}}
@@ -291,7 +291,7 @@
             }%
         }%
     }
-    {-0.46cm}
+    {0pt}
     {\color{DimGray}%
      \begin{tabular}{@{}>{\raggedright\arraybackslash}b{0.6\linewidth}
                                      >{\raggedleft\arraybackslash}p{\dimexpr0.4\linewidth-2\tabcolsep}@{}}
